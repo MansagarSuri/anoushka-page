@@ -21,12 +21,15 @@
 
       .container {
         min-height: 100vh;
-
-        background: linear-gradient(
+        background-color: #f0e6ff;
+        background-image: linear-gradient(
             rgba(255, 255, 255, 0.7),
             rgba(255, 255, 255, 0.7)
           ),
-          url("/ourPhoto.jpg") no-repeat center center fixed;
+          url("ourPhoto.jpg");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
         background-size: cover;
         display: flex;
         flex-direction: column;
@@ -37,11 +40,11 @@
       }
 
       .content {
-        background-image: url("/ourPhoto.jpg");
+        background-color: rgba(255, 255, 255, 0.85);
+        background-image: url("ourPhoto.jpg");
         background-size: cover;
         background-position: center;
         background-blend-mode: overlay;
-        background-color: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(8px);
         border-radius: 15px;
         padding: 40px;
@@ -248,56 +251,79 @@
       </div>
     </div>
 
+    <!-- Add an audio element for background music -->
+    <audio id="bgMusic" preload="auto" loop>
+      <source src="Tu Jae Jahan (PenduJatt.Com.Se).mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+
+    <!-- Add a music control button -->
+    <div class="music-control">
+      <button id="musicToggle">🔊 Music On/Off</button>
+    </div>
+
     <script>
+      // Wait for the DOM to be fully loaded
       document.addEventListener("DOMContentLoaded", function () {
+        // Add heart animations
         createHearts();
-
+        
+        // Set up love button
         const loveButton = document.getElementById("love-button");
-        loveButton.addEventListener("click", function () {
-          showHeartExplosion();
-        });
-      });
-
-      // Add this to your existing document.addEventListener function
-      document.addEventListener("DOMContentLoaded", function () {
-        createHearts();
-
-        const loveButton = document.getElementById("love-button");
-        loveButton.addEventListener("click", function () {
-          showHeartExplosion();
-        });
+        if (loveButton) {
+          loveButton.addEventListener("click", function () {
+            showHeartExplosion();
+          });
+        }
 
         // Set up music controls
         const music = document.getElementById("bgMusic");
         const musicToggle = document.getElementById("musicToggle");
-
-        // Auto-play music (requires user interaction due to browser policies)
-        document.body.addEventListener(
-          "click",
-          function () {
-            if (music.paused) {
-              music.play().catch((error) => {
-                console.log("Audio play failed:", error);
+        
+        if (music && musicToggle) {
+          // Try to preload the audio
+          music.load();
+          
+          // Try to play music on first user interaction (required by browsers)
+          document.body.addEventListener("click", function firstClick() {
+            console.log("User clicked - attempting to play music");
+            const playPromise = music.play();
+            
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                console.log("Audio playback started successfully");
+              }).catch((error) => {
+                console.log("Audio playback failed:", error);
               });
             }
-          },
-          { once: true }
-        );
+            
+            // Remove this event listener after first click
+            document.body.removeEventListener("click", firstClick);
+          }, { once: true });
 
-        // Toggle music button
-        musicToggle.addEventListener("click", function () {
-          if (music.paused) {
-            music.play();
-            musicToggle.textContent = "🔊 Music On/Off";
-          } else {
-            music.pause();
-            musicToggle.textContent = "🔇 Music On/Off";
-          }
-        });
+          // Music toggle button
+          musicToggle.addEventListener("click", function () {
+            console.log("Music toggle clicked");
+            if (music.paused) {
+              music.play().then(() => {
+                console.log("Music started playing");
+                musicToggle.textContent = "🔊 Music On/Off";
+              }).catch(error => {
+                console.log("Failed to play music:", error);
+              });
+            } else {
+              music.pause();
+              console.log("Music paused");
+              musicToggle.textContent = "🔇 Music On/Off";
+            }
+          });
+        }
       });
 
       function createHearts() {
         const heartsContainer = document.getElementById("hearts");
+        if (!heartsContainer) return;
+        
         const heartSymbols = ["❤️", "💖", "💗", "💓", "💕"];
         const numberOfHearts = 15;
 
@@ -331,6 +357,8 @@
 
       function showHeartExplosion() {
         const container = document.querySelector(".container");
+        if (!container) return;
+        
         const numberOfHearts = 100;
         const heartSymbols = ["❤️", "💖", "💗", "💓", "💕", "💘", "💝", "💞"];
 
@@ -374,15 +402,5 @@
         }
       }
     </script>
-    <!-- Add an audio element for background music -->
-    <audio id="bgMusic" loop>
-      <source src="/Tu Jae Jahan (PenduJatt.Com.Se).mp3" type="audio/mp3" />
-      Your browser does not support the audio element.
-    </audio>
-
-    <!-- Add a music control button -->
-    <div class="music-control">
-      <button id="musicToggle">🔊 Music On/Off</button>
-    </div>
   </body>
 </html>
